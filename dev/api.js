@@ -1,12 +1,22 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+
 
 app.get('/blockchain', function (req, res) {
 
 });
 
 app.post('/transaction', function (req, res) {
-
+    console.log(req.body);
+    var amount = req.body.amount;
+    res.send('The amount of the transaction is ' + amount + ' bitcoin.');
 });
 
 app.get('/mine', function (req, res) {
