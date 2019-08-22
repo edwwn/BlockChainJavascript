@@ -4,6 +4,8 @@ const sha256 = require('sha256');
 function Blockchain() {
     this.chain = [];
     this.pendingTransactions = [];
+
+    this.createNewBlock(100, '0', '0'); // this is the genesisBlock
 };
 
 Blockchain.prototype.createNewBlock = function (nonce, previuosBlockhash, hash) {
