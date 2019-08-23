@@ -1,5 +1,6 @@
 const sha256 = require('sha256');
-const currentNodeUrl = process.agrv[3];
+
+const currentNodeUrl = process.argv[3];
 
 
 function Blockchain() {
@@ -59,7 +60,6 @@ Blockchain.prototype.proofOfWork = function (previuosBlockhash, currentBlockData
         //console.log(hash);
     };
     return nonce;
-
 };
 
 module.exports = Blockchain;
