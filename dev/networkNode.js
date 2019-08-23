@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const Blockchain = require('./blockchain');
 const uuid = require('uuid/v1');
 const port = process.argv[2];
+const rp = require('request-promise');
 
 const nodeAddress = uuid().split('-').join('');
 
@@ -52,10 +53,58 @@ app.get('/mine', function (req, res) {
     res.json({
         note: "New Block Mined Successfully",
         block: newBlock
-    })
+    });
 });
 
-app.listen(port, function () {
-    console.log(`Listening to port ${port}.....`);
+// register a node and broadcast it to network
+app.post('/register-and-brocast-node', function (req, res) {
+            const newNodeUrl = req.body.newNodeUrl;
+            // registering new node if it already doenst exist
+            if (bitcoin.networkNodes.indexOf(newNodeUrl == -1)) bitcoin.networkNodes.push(newNodeUrl);
 
-});
+            const regNodesPromises = [];
+            bitcoin.networkNodes.forEach(networkNodeUrl => {
+                const requestOptions = {
+                    url: networkNodeUrl + '/register-node',
+                    method: 'POST',
+                    body: {
+                        newNodeUrl: newNodeUrl
+                    },
+                    json: true
+                };
+                regNodesPromises.push(rp(requestOptions));
+            });
+            Promise.all(regNodesPromises)
+                .then(data => {
+                    const bulkRegisterOptions = {
+                        url: newNodeUrl + '/register-nodes-bulk',
+                        method: 'POST',
+                        body: {
+                            allNewtworkNodes: [...bitcoin.networkNodes, bitcoin.currentNodeUrl]
+                        },
+                        json: true
+                    };
+                    return rp(bulkRegisterOptions);
+                })
+                .then(data => {
+                    res.json({
+                        note: 'New Node Registered With Network Succefully'
+                    });
+                });
+
+            // register a node with network
+            app.post('/register-node', function (req, res) {
+
+            });
+
+
+            // regiter multiple nodes at once
+            app.post('/register-nodes-bulk', function (req, res) {
+
+            });
+
+
+            app.listen(port, function () {
+                console.log(`Listening to port ${port}.....`);
+
+            });
